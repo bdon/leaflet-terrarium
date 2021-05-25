@@ -19,10 +19,18 @@
     </body>
     <script type="module">
         import Layer from './index.js'
-        
+
         let map = L.map('map',{maxZoom:14})
         let hash = new L.Hash(map)
         if (!window.location.hash) map.setView(new L.LatLng(0,0),1)
-        console.log(Layer)
+
+        // get your own key at https://developers.nextzen.org
+        const API_KEY = "ISCgs_UQQ0Kv7p5mx_xyNQ"
+        let layer = new Layer({
+            url:"https://tile.nextzen.org/tilezen/terrain/v1/260/terrarium/{z}/{x}/{y}.png?api_key=" + API_KEY,
+            debug:null,
+            attribution:'<a href="https://www.nextzen.com/" target="_blank">Nextzen</a>'
+        })
+        layer.addTo(map)
     </script>
 </html>
