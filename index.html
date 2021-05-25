@@ -13,9 +13,27 @@
             height:100vh;
             margin:0px;
         }
+
+        .controls {
+            position: absolute;
+            z-index: 99999;
+            bottom: 1rem;
+            left: 1rem;
+            margin: 1rem;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 4px;
+            font-family: sans-serif;
+        }
     </style>
     <body>
         <div id="map"></div> 
+        <div class="controls">
+            azimuth
+            <input type="range" min="0" max="360" value="315" class="slider" id="azimuth">
+            elevation
+            <input type="range" min="0" max="90" value="45" class="slider" id="elevation">
+        </div>
     </body>
     <script type="module">
         import Layer from './index.js'
@@ -32,5 +50,15 @@
             attribution:'<a href="https://www.nextzen.com/" target="_blank">Nextzen</a>'
         })
         layer.addTo(map)
+        let azimuth = document.getElementById("azimuth")
+        azimuth.addEventListener('input', e => {
+            layer.azimuth = e.target.value
+            layer.rerenderTiles()
+        })
+        elevation = document.getElementById("elevation")
+        elevation.addEventListener('input', e => {
+            layer.elevation = e.target.value
+            layer.rerenderTiles()
+        })
     </script>
 </html>

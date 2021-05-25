@@ -85,7 +85,7 @@ export class ZxySource {
         this.currentZ = undefined
     }
 
-    async get(c) {
+    async get(c,azimuth,elevation) {
         this.currentZ = c.z
         this.controllers = this.controllers.filter(cont => {
             if (cont[0] != this.currentZ) {
@@ -105,8 +105,6 @@ export class ZxySource {
         let scratchCtx = scratch.getContext('2d')
         scratchCtx.drawImage(x,0,0,260,260)
         let data = scratchCtx.getImageData(0,0,260,260)
-        let azimuth = 315
-        let elevation = 45
 
         let alpha = Math.PI / 180 * azimuth
         let beta = Math.PI / 180 * elevation
@@ -150,6 +148,25 @@ class Layer extends L.GridLayer {
         this.debug = options.debug
         this.pool = new CanvasPool(256)
         this.source = new ZxySource(options.url)
+        this.azimuth = 315
+        this.elevation = 45
+    }
+
+    rerenderTile(key) {
+        for (var unwrapped_k in this._tiles) {
+            let wrapped_coord = this._wrapCoords(this._keyToTileCoords(unwrapped_k))
+            if (key === this._tileCoordsToKey(wrapped_coord)) {
+                this.renderTile(wrapped_coord,this._tiles[unwrapped_k].el,key)
+            }
+        }
+    }
+
+    rerenderTiles() {
+        for (var unwrapped_k in this._tiles) {
+            let wrapped_coord = this._wrapCoords(this._keyToTileCoords(unwrapped_k))
+            let key = this._tileCoordsToKey(wrapped_coord)
+            this.renderTile(wrapped_coord,this._tiles[unwrapped_k].el,key)
+        }
     }
 
     async renderTile(coords,element,key,done = ()=>{}) {
@@ -157,7 +174,7 @@ class Layer extends L.GridLayer {
         if (!this._map) return
         var paint_data
         try {
-            paint_data = await this.source.get(coords)
+            paint_data = await this.source.get(coords,this.azimuth,this.elevation)
         } catch(e) {
             if (e.name === "AbortError") return
             else throw e
